@@ -6,7 +6,7 @@ It can get all corresponding posts and put it in attribute '.posts'
 
 import time
 from concurrent.futures import ThreadPoolExecutor
-from typing import Union
+from typing import List, Union
 
 import requests
 
@@ -39,7 +39,7 @@ class Post:
         date: int,
         text: str,
         attachments: int,
-        links: list,
+        links: List[str],
         likes: int,
         comments: int,
         reposts: int,
