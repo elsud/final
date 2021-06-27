@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
 from functools import lru_cache, wraps
 
+import matplotlib
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 from flask import Flask, redirect, render_template, request, send_file, url_for
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SubmitField
@@ -11,6 +14,8 @@ from model.client import Wall
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
+
+matplotlib.use("Agg")
 
 
 class WallForm(FlaskForm):
@@ -102,8 +107,11 @@ def posts(id: int, date: str):
             (k, v["posts"], v["likes"], v["comments"], v["reposts"])
             for k, v in statistic.items()
         )
-        if look == "graphic":
-            return "There will be plan"
+        if look == "plot":
+            create_plot(data)
+            return render_template(
+                "plot.html", title=title, form=form, url="/static/images/plot.png"
+            )
         return render_template("statistic.html", title=title, data=data, form=form)
 
     statistic = wall.get_statistic()
@@ -154,6 +162,25 @@ def get_wall(id: int, date: str) -> "Wall":
     :rtype: Wall
     """
     return Wall(id, date)
+
+
+def create_plot(data):
+    periods, posts, likes, comments, reposts = zip(*data)
+
+    plt.bar(periods, posts, width=0.8, color=["grey"])
+    plt.bar(periods, likes, width=0.8, color=["red"])
+    plt.bar(periods, comments, width=0.8, color=["green"])
+    plt.bar(periods, reposts, width=0.8, color=["blue"])
+    plt.xlabel("period", fontsize=11, color="black")
+    plt.ylabel("count", fontsize=11, color="black")
+    plt.title("statistic of posts' count", fontsize=13, loc="center")
+    grey_patch = mpatches.Patch(color="grey", label="Posts")
+    red_patch = mpatches.Patch(color="red", label="Likes")
+    green_patch = mpatches.Patch(color="green", label="Comments")
+    blue_patch = mpatches.Patch(color="blue", label="Reposts")
+    plt.legend(handles=[grey_patch, red_patch, green_patch, blue_patch])
+    plt.savefig("view/static/images/plot.png")
+    plt.close()
 
 
 @app.route("/download_file")
