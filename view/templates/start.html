@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Choose</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.id.label }}<br>
+            {{ form.id(size=32) }}
+            {% for error in form.id.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.date.label }}<br>
+            {{ form.date(size=32) }}
+        </p>
+        <p>{{ form.is_group() }} {{ form.is_group.label }}</p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
+
