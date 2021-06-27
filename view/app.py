@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from functools import lru_cache, wraps
 
-from flask import Flask, redirect, render_template, request, send_file
+from flask import Flask, redirect, render_template, request, send_file, url_for
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -55,9 +55,11 @@ def start():
             form.date.data = 0
 
         if form.is_group.data:
-            return redirect(f"/posts/-{form.id.data}/{form.date.data}")
+            return redirect(
+                url_for("posts", id=f"-{form.id.data}", date=form.date.data)
+            )
 
-        return redirect(f"/posts/{form.id.data}/{form.date.data}")
+        return redirect(url_for("posts", id=form.id.data, date=form.date.data))
 
     return render_template("start.html", title="Choose id", form=form)
 
@@ -89,7 +91,7 @@ def posts(id: int, date: str):
         )
         args = (item for index, item in enumerate(params) if mask[index])
         wall.get_csv(*args)
-        return redirect("/download_file")
+        return redirect(url_for("download_file"))
 
     if request.method == "POST":
         select = request.form.get("interval")
