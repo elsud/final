@@ -4,6 +4,7 @@ ststistic on count of posts and average counts of likes, comments and reposts
 in some period (year, month, day or hour). Also it can write choosen
 info about posts in csv file.
 """
+
 import csv
 import datetime
 import time
@@ -37,6 +38,7 @@ class Wall:
         :return: list with Post objects
         :rtype: list"""
         if not self._posts:
+
             wall = ServiceWall(self.id, self.date)
             wall.get_all_posts()
             self._posts = wall._posts
@@ -58,9 +60,12 @@ class Wall:
             for post in self.posts:
                 writer.writerow((str(post.__dict__.get(arg)) for arg in args))
 
-    def get_statistic_for_period(self, posts: list, period: str, point: int) -> dict:
+    @staticmethod
+    def get_statistic_for_period(posts: list, period: str, point: int) -> dict:
         """Pick statistic (count of posts, average count of likes, comments,
         reposts) for one period.
+        :param posts: list of posts to get statistic info
+        :type posts: list
         :param period: period to get posts (for example '3.2021')
         :type period: str
         :param point: timestamp of the beginning of the period
@@ -114,15 +119,13 @@ class Wall:
             period = str(int(period) - 1)
             point = time.mktime(time.strptime(period, "%Y"))
         if duration == "day":
-            before = datetime.datetime.fromtimestamp(point)
-            after = before - datetime.timedelta(days=1)
-            period = after.strftime("%d.%m.%Y")
-            point = time.mktime(time.strptime(period, "%d.%m.%Y"))
+            seconds_in_day = 86400
+            point = point - seconds_in_day
+            period = datetime.datetime.fromtimestamp(point).strftime("%d.%m.%Y")
         if duration == "hour":
-            before = datetime.datetime.fromtimestamp(point)
-            after = before - datetime.timedelta(hours=1)
-            period = after.strftime("%H.%d.%m.%Y")
-            point = time.mktime(time.strptime(period, "%H.%d.%m.%Y"))
+            seconds_in_hour = 3600
+            point = point - seconds_in_hour
+            period = datetime.datetime.fromtimestamp(point).strftime("%H.%d.%m.%Y")
         return period, point
 
     @staticmethod

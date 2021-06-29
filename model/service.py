@@ -3,7 +3,7 @@
 owner and date since which posts on the wall are interesting.
 It can get all corresponding posts and put it in attribute '.posts'
 """
-
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Union
@@ -11,6 +11,8 @@ from typing import List, Union
 import requests
 
 from config import API, TOKEN, V
+
+thread_local = threading.local()
 
 
 class Post:
@@ -57,7 +59,7 @@ class Post:
         """Compares instances of Post by their date."""
         return self.date < other.date
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         """String representation of Post's instances."""
         return str(self.id)
 
@@ -81,6 +83,13 @@ class ServiceWall:
             self.date = 0
         self._posts = []
 
+    @staticmethod
+    def get_session():
+        """Gets requests.Session for one thread."""
+        if not hasattr(thread_local, "session"):
+            thread_local.session = requests.Session()
+        return thread_local.session
+
     def get_posts(self, offset: int = 0) -> bool:
         """Get 100 or less posts from the wall and put it in '_posts'.
         If date from which we search posts is reached function stops get posts
@@ -95,28 +104,31 @@ class ServiceWall:
             f"owner_id={self.id}&count=100&offset={offset}&access_token={TOKEN}&v={V}"
         )
         url = f"{API}/wall.get?{params}"
-        response = requests.get(url).json()
-        info = response.get("response", {}).get("items", {})
-        for item in info:
-            if item["date"] < self.date:
+        session = self.get_session()
+        with session.get(url) as response:
+            info = response.json().get("response", {}).get("items", {})
+            for item in info:
+                if item["date"] < self.date:
+                    flag = False
+                    break
+                id = item["id"]
+                date = item["date"]
+                text = item["text"]
+                links = []
+                is_attachments = item.get("attachments", None)
+                if is_attachments:
+                    for element in item["attachments"]:
+                        links.append(ServiceWall.get_links(element))
+                attachments = len(item["attachments"]) if is_attachments else 0
+                likes = item.get("likes", {}).get("count", 0)
+                reposts = item.get("reposts", {}).get("count", 0)
+                comments = item["comments"]["count"]
+                post = Post(
+                    id, date, text, attachments, links, likes, comments, reposts
+                )
+                self._posts.append(post)
+            if len(info) < 100:
                 flag = False
-                break
-            id = item["id"]
-            date = item["date"]
-            text = item["text"]
-            links = []
-            is_attachments = item.get("attachments", None)
-            if is_attachments:
-                for element in item["attachments"]:
-                    links.append(ServiceWall.get_links(element))
-            attachments = len(item["attachments"]) if is_attachments else 0
-            likes = item.get("likes", {}).get("count", 0)
-            reposts = item["reposts"]["count"]
-            comments = item["comments"]["count"]
-            post = Post(id, date, text, attachments, links, likes, comments, reposts)
-            self._posts.append(post)
-        if len(info) < 100:
-            flag = False
         return flag
 
     @staticmethod
