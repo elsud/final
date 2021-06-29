@@ -6,4 +6,4 @@ API = "https://api.vk.com/method"
 V = 5.131
 
 SECRET_KEY = secrets.token_urlsafe(16)
-TOKEN = os.environ.get('VK_API_TOKEN')
+TOKEN = os.environ.get("VK_API_TOKEN")
