@@ -21,6 +21,7 @@ jobs:
           isort --profile black --check .
           py.test tests
   docker_build_push:
+    needs: code_quality
     runs-on: ubuntu-latest
     name: Build docker image and pudh to AWS registry
     steps:
