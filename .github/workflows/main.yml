@@ -25,6 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Build docker image and pudh to AWS registry
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
