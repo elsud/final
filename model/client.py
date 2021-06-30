@@ -13,6 +13,32 @@ from typing import Tuple, Union
 from model.service import ServiceWall
 
 
+class Statistic:
+    """Keeps statistic information about count of posts and
+    average counts of likes, comments, reposts for one period.
+    :param period: period, for example '23.12.2020'
+    :type period: str
+    :param posts: count of posts
+    :type posts: int
+    :param likes: count of likes
+    :type likes: float
+    :param comments: count of comments
+    :type comments: float
+    :param reposts: count of reposts
+    :type reposts: float
+    """
+
+    __slots__ = ("period", "posts", "likes", "comments", "reposts")
+
+    def __init__(self, period, posts, likes, comments, reposts):
+
+        self.period = period
+        self.posts = posts
+        self.likes = likes
+        self.comments = comments
+        self.reposts = reposts
+
+
 class Wall:
     """Class for user's or group's wall representation.
     Implements ability to get information about posts in statistics or
@@ -38,7 +64,6 @@ class Wall:
         :return: list with Post objects
         :rtype: list"""
         if not self._posts:
-
             wall = ServiceWall(self.id, self.date)
             wall.get_all_posts()
             self._posts = wall._posts
@@ -58,7 +83,7 @@ class Wall:
             writer = csv.writer(report)
             writer.writerow(args)
             for post in self.posts:
-                writer.writerow((str(post.__dict__.get(arg)) for arg in args))
+                writer.writerow((str(post.__getattribute__(arg)) for arg in args))
 
     @staticmethod
     def get_statistic_for_period(posts: list, period: str, point: int) -> dict:
@@ -85,14 +110,10 @@ class Wall:
             likes_count = round(likes_count / posts_count, 2)
             comments_count = round(comments_count / posts_count, 2)
             reposts_count = round(reposts_count / posts_count, 2)
-        return {
-            period: {
-                "posts": posts_count,
-                "likes": likes_count,
-                "comments": comments_count,
-                "reposts": reposts_count,
-            }
-        }
+
+        return Statistic(
+            period, posts_count, likes_count, comments_count, reposts_count
+        )
 
     @staticmethod
     def change_period(duration: str, period: str, point: float) -> Tuple[str, float]:
@@ -113,7 +134,7 @@ class Wall:
             else:
                 year -= 1
                 month = 12
-            period = f"0{month}.{year}" if month < 9 else f"{month}.{year}"
+            period = f"0{month}.{year}" if month < 10 else f"{month}.{year}"
             point = time.mktime(time.strptime(period, "%m.%Y"))
 
         if duration == "year":
@@ -166,10 +187,8 @@ class Wall:
         period, point = Wall.get_period(duration)
         posts = self.posts
         length = 0
-        result = dict()
         while length < len(posts):
-            to_update = self.get_statistic_for_period(posts[length:], period, point)
-            result.update(to_update)
-            length += to_update[period]["posts"]
+            statistic = self.get_statistic_for_period(posts[length:], period, point)
+            length += statistic.posts
             period, point = Wall.change_period(duration, period, point)
-        return result
+            yield statistic
