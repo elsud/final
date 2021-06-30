@@ -113,19 +113,23 @@ class Wall:
             else:
                 year -= 1
                 month = 12
-            period = f"{month}.{year}"
+            period = f"0{month}.{year}" if month < 9 else f"{month}.{year}"
             point = time.mktime(time.strptime(period, "%m.%Y"))
+
         if duration == "year":
             period = str(int(period) - 1)
             point = time.mktime(time.strptime(period, "%Y"))
+
         if duration == "day":
             seconds_in_day = 86400
             point = point - seconds_in_day
             period = datetime.datetime.fromtimestamp(point).strftime("%d.%m.%Y")
+
         if duration == "hour":
             seconds_in_hour = 3600
             point = point - seconds_in_hour
             period = datetime.datetime.fromtimestamp(point).strftime("%H.%d.%m.%Y")
+
         return period, point
 
     @staticmethod
@@ -136,6 +140,7 @@ class Wall:
         :return: tuple with period and timestamp of its beginning
         :rtype: tuple with str and float
         """
+
         if duration == "month":
             period = datetime.date.today().strftime("%m.%Y")
             point = time.mktime(time.strptime(period, "%m.%Y"))
