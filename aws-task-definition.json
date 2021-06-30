@@ -3,7 +3,7 @@
         {
             "name": "vkparser",
             "cpu": 0,
-            "memory": 384,
+            "memory": 100,
             "portMappings": [
                 {
                     "containerPort": 5000,
