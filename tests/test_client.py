@@ -39,15 +39,21 @@ def test_get_statistic_for_period():
     wall = Wall(1)
     wall._posts = [Post("id", 10, "text", 1, ["link"], 1, 1, 1)]
     stat = wall.get_statistic_for_period(wall._posts, "period", 0)
-    assert stat == {
-        "period": {"posts": 1.00, "likes": 1.00, "comments": 1.00, "reposts": 1.00}
-    }
+    assert stat.period == "period"
+    assert stat.posts == 1
+    assert stat.likes == 1.00
+    assert stat.comments == 1.00
+    assert stat.reposts == 1.00
 
 
 def test_get_statistic_for_period_handles_zero_division_error():
     wall = Wall(1)
     stat = wall.get_statistic_for_period(wall._posts, "period", 0)
-    assert stat == {"period": {"posts": 0, "likes": 0, "comments": 0, "reposts": 0}}
+    assert stat.period == "period"
+    assert stat.posts == 0
+    assert stat.likes == 0
+    assert stat.comments == 0
+    assert stat.reposts == 0
 
 
 def test_change_period_with_year():

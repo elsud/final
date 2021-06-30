@@ -104,8 +104,8 @@ def posts(id: int, date: str):
         statistic = wall.get_statistic(select)
         title = f"Statistic in {select}"
         data = (
-            (k, v["posts"], v["likes"], v["comments"], v["reposts"])
-            for k, v in statistic.items()
+            (item.period, item.posts, item.likes, item.comments, item.reposts)
+            for item in statistic
         )
         if look == "plot":
             create_plot(data)
@@ -116,8 +116,8 @@ def posts(id: int, date: str):
 
     statistic = wall.get_statistic()
     data = (
-        (k, v["posts"], v["likes"], v["comments"], v["reposts"])
-        for k, v in statistic.items()
+        (item.period, item.posts, item.likes, item.comments, item.reposts)
+        for item in statistic
     )
     return render_template(
         "statistic.html", title="Statistic in month", data=data, form=form
@@ -178,7 +178,9 @@ def create_plot(data):
     red_patch = mpatches.Patch(color="red", label="Likes")
     green_patch = mpatches.Patch(color="green", label="Comments")
     blue_patch = mpatches.Patch(color="blue", label="Reposts")
-    plt.legend(handles=[grey_patch, red_patch, green_patch, blue_patch])
+    plt.legend(
+        handles=[grey_patch, red_patch, green_patch, blue_patch], loc="upper right"
+    )
     plt.savefig("view/static/images/plot.png")
     plt.close()
 

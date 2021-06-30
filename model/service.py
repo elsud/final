@@ -35,6 +35,17 @@ class Post:
     :type reposts: int
     """
 
+    __slots__ = (
+        "id",
+        "date",
+        "text",
+        "attachments",
+        "links",
+        "likes",
+        "comments",
+        "reposts",
+    )
+
     def __init__(
         self,
         id: int,
