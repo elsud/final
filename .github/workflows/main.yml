@@ -24,7 +24,7 @@ jobs:
   docker_build_push_deploy:
     needs: code_quality
     runs-on: ubuntu-latest
-    name: Build docker image and pudh to AWS registry
+    name: Build docker image, push to AWS registry, deploy to ECS
     if: github.ref == 'refs/heads/master'
     
     steps:
@@ -41,6 +41,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Build, tag, and push image to Amazon ECR
+      id: build-image
       env:
         ECR_REGISTRY: 578244600107.dkr.ecr.us-east-1.amazonaws.com
         ECR_REPOSITORY: vkparser
