@@ -24,6 +24,7 @@ jobs:
     needs: code_quality
     runs-on: ubuntu-latest
     name: Build docker image and pudh to AWS registry
+    if: github.ref == 'refs/heads/master'
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
