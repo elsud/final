@@ -66,5 +66,5 @@ jobs:
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: vkparser
-        cluster: mysheapp
+        cluster: Mysheapp
         wait-for-service-stability: true
