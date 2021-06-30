@@ -15,7 +15,7 @@
             "environment": [
                 {
                     "name": "VK_API_TOKEN",
-                    "value": "$$VK_API_TOKEN$$"
+                    "value": "__VK_API_TOKEN__"
                 }
             ],
             "mountPoints": [],
