@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <h3>Choose interval</h3>
+    <form name="choose" method="POST" action="">
+        <div class="form=group">
+            <div class="input-group">
+                <select name="interval" id="interval">
+                    <option value="month">month</option>
+                    <option value="day">day</option>
+                    <option value="hour">hour</option>
+                    <option value="year">year</option>
+                </select>
+                <select name="look" id="look">
+                    <option value="table">table</option>
+                    <option value="plot">plot</option>
+                </select>
+            </div>
+        <button type="submit" name="submit">Submit</button>
+        </div>
+    </form>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>{{ form.id() }} {{ form.id.label }}</p>
+        <p>{{ form.text() }} {{ form.text.label }}</p>
+        <p>{{ form.attachments() }} {{ form.attachments.label  }}</p>
+        <p>{{ form.links() }} {{ form.links.label  }}</p>
+        <p>{{ form.likes() }} {{ form.likes.label  }}</p>
+        <p>{{ form.comments() }} {{ form.comments.label  }}</p>
+        <p>{{ form.reposts() }} {{ form.reposts.label }}</p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    <table style="width:100%">
+        <tr>
+            <th>period</th>
+            <th>posts' count</th>
+            <th>likes' count</th>
+            <th>comments'count</th>
+            <th>reposts' count</th>
+        </tr>
+        {% for period, posts, likes, comments, reposts in data %}
+        <tr>
+            <td>{{ period }}</td>
+            <td>{{ posts }}</td>
+            <td>{{ likes }}</td>
+            <td>{{ comments }}</td>
+            <td>{{ reposts }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
