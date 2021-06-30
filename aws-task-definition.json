@@ -1,0 +1,42 @@
+{
+    "containerDefinitions": [
+        {
+            "name": "vkparser",
+            "cpu": 0,
+            "memory": 384,
+            "portMappings": [
+                {
+                    "containerPort": 5000,
+                    "hostPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "VK_API_TOKEN",
+                    "value": "$$VK_API_TOKEN$$"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": []
+        }
+    ],
+    "family": "mysheapp",
+    "revision": 1,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EXTERNAL",
+        "EC2"
+    ],
+    "requiresCompatibilities": [
+        "EC2"
+    ]
+}
