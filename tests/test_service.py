@@ -47,11 +47,3 @@ def test_get_links_when_url_in_values():
 def test_get_links_when_url_in_list_inside_values():
     link = ServiceWall.get_links({"key": ["value", {"url": "link"}]})
     assert link == "link"
-
-
-def test_get_posts_returns_false_when_count_of_posts_less_than_100(monkeypatch):
-    mock_request = Mock()
-    mock_request.get.return_value.json.return_value == {1: 1}
-    monkeypatch.setitem(globals(), "requests", mock_request)
-    wall = ServiceWall(1111)
-    assert wall.get_posts() is False

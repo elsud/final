@@ -1,4 +1,4 @@
-# This is a basic workflow to check code with black and isort and run tests.
+# This is a workflow to check code with black and isort, run tests, build docker image and push to AWS registry.
 
 name: CI
 
@@ -20,11 +20,13 @@ jobs:
           black --check .
           isort --profile black --check .
           py.test tests
+
   docker_build_push:
     needs: code_quality
     runs-on: ubuntu-latest
     name: Build docker image and pudh to AWS registry
     if: github.ref == 'refs/heads/master'
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -44,9 +46,5 @@ jobs:
         ECR_REPOSITORY: vkparser
         IMAGE_TAG: latest
       run: |
-        pwd
-        ls -lah
-        ls -lah ..
-        ls -lah ../..
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

@@ -1,4 +1,5 @@
 import csv
+import time
 
 from model.client import Wall
 from model.service import Post
@@ -62,3 +63,31 @@ def test_change_period_with_month():
 def test_change_period_with_month_between_two_years():
     result = Wall.change_period("month", "1.2021", 122)
     assert result[0] == "12.2020"
+
+
+def test_change_period_with_day():
+    arg1 = "11.01.2021"
+    arg2 = time.mktime(time.strptime(arg1, "%d.%m.%Y"))
+    result = Wall.change_period("day", arg1, arg2)
+    assert result[0] == "10.01.2021"
+
+
+def test_change_period_with_day_between_two_months():
+    arg1 = "01.01.2021"
+    arg2 = time.mktime(time.strptime(arg1, "%d.%m.%Y"))
+    result = Wall.change_period("day", arg1, arg2)
+    assert result[0] == "31.12.2020"
+
+
+def test_change_period_with_hour():
+    arg1 = "12.11.01.2021"
+    arg2 = time.mktime(time.strptime(arg1, "%H.%d.%m.%Y"))
+    result = Wall.change_period("hour", arg1, arg2)
+    assert result[0] == "11.11.01.2021"
+
+
+def test_change_period_with_hour_between_two_days():
+    arg1 = "00.01.01.2021"
+    arg2 = time.mktime(time.strptime(arg1, "%H.%d.%m.%Y"))
+    result = Wall.change_period("hour", arg1, arg2)
+    assert result[0] == "23.31.12.2020"
