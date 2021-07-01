@@ -54,6 +54,7 @@ jobs:
       id: task-token
       run: |
         sed -i 's/__VK_API_TOKEN__/${{ secrets.VK_API_TOKEN }}/g' aws-task-definition.json
+        cat aws-task-definition.json
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
