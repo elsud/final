@@ -4,12 +4,13 @@ from functools import lru_cache, wraps
 import matplotlib
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-from flask import Flask, redirect, render_template, request, send_file, url_for
+from flask import Flask, json, redirect, render_template, request, send_file, url_for
 from flask_wtf import FlaskForm
+from werkzeug.exceptions import HTTPException
 from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired
 
-from config import SECRET_KEY
+from config import SECRET_KEY, TOKEN
 from model.client import Wall
 
 app = Flask(__name__)
@@ -46,6 +47,14 @@ class DownloadForm(FlaskForm):
     submit = SubmitField("Download")
 
 
+class TokenNotFound(HTTPException):
+    """Error to notice that app doesn't get token from config."""
+
+    name = "TokenNotFound"
+    status_code = 503
+    description = "Can't use"
+
+
 @app.route("/", methods=["GET", "POST"])
 def start():
     """Renders start template with form to enter id and date to get posts
@@ -53,6 +62,9 @@ def start():
     given it will be set to 0 and rebders template with info about
     all posts on the wall.
     """
+    if not TOKEN:
+        raise TokenNotFound("Can't work without token")
+
     form = WallForm()
 
     if form.validate_on_submit():
@@ -80,6 +92,9 @@ def posts(id: int, date: str):
     :type date: str
     :return: redirect or render_template
     """
+    if not TOKEN:
+        raise TokenNotFound("Can't work without token")
+
     form = DownloadForm()
     wall = get_wall(id, date)
 
@@ -188,7 +203,7 @@ def create_plot(data):
 @app.route("/download_file")
 def download_file():
     """Downloads csv file with statistic."""
-    return send_file("../model/files/to_download.csv")
+    return send_file("../model/files/to_download.csv", status_code=503)
 
 
 @app.errorhandler(404)
@@ -197,7 +212,22 @@ def page_not_found(e):
     return "Resourse not found. Check given information."
 
 
+@app.errorhandler(TokenNotFound)
+def handle_503(e):
+    response = e.get_response()
+    response.data = json.dumps(
+        {
+            "code": e.code,
+            "name": e.name,
+            "description": e.description,
+        }
+    )
+    response.content_type = "application/json"
+    return response
+
+
 app.register_error_handler(404, page_not_found)
+app.register_error_handler(TokenNotFound, handle_503)
 
 if __name__ == "__main__":
     app.run()
