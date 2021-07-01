@@ -118,15 +118,16 @@ def posts(id: int, date: str):
         look = request.form.get("look")
         statistic = wall.get_statistic(select)
         title = f"Statistic in {select}"
+
+        if look == "plot":
+            create_plot(select, statistic)
+            return render_template(
+                "plot.html", title=title, form=form, url="/static/images/plot.png"
+            )
         data = (
             (item.period, item.posts, item.likes, item.comments, item.reposts)
             for item in statistic
         )
-        if look == "plot":
-            create_plot(data)
-            return render_template(
-                "plot.html", title=title, form=form, url="/static/images/plot.png"
-            )
         return render_template("statistic.html", title=title, data=data, form=form)
 
     statistic = wall.get_statistic()
@@ -179,7 +180,17 @@ def get_wall(id: int, date: str) -> "Wall":
     return Wall(id, date)
 
 
-def create_plot(data):
+def create_plot(select, statistic):
+    if select == "year":
+        data = (
+            (item.period, item.posts, item.likes, item.comments, item.reposts)
+            for item in statistic
+        )
+    else:
+        data = (
+            (item.period[:2], item.posts, item.likes, item.comments, item.reposts)
+            for item in statistic
+        )
     periods, posts, likes, comments, reposts = zip(*data)
 
     plt.bar(periods, posts, width=0.8, color=["grey"])
