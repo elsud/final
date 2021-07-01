@@ -69,6 +69,11 @@ def start():
     return render_template("start.html", title="Choose id", form=form)
 
 
+@app.route("/look")
+def look():
+    return "blablabla"
+
+
 @app.route("/posts/<id>/<date>", methods=["GET", "POST"])
 def posts(id: int, date: str):
     """Render template to show info from wall in monthes.
