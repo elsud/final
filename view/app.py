@@ -118,16 +118,15 @@ def posts(id: int, date: str):
         look = request.form.get("look")
         statistic = wall.get_statistic(select)
         title = f"Statistic in {select}"
-
-        if look == "plot":
-            create_plot(select, statistic)
-            return render_template(
-                "plot.html", title=title, form=form, url="/static/images/plot.png"
-            )
         data = (
             (item.period, item.posts, item.likes, item.comments, item.reposts)
             for item in statistic
         )
+        if look == "plot":
+            create_plot(data)
+            return render_template(
+                "plot.html", title=title, form=form, url="/static/images/plot.png"
+            )
         return render_template("statistic.html", title=title, data=data, form=form)
 
     statistic = wall.get_statistic()
@@ -180,17 +179,7 @@ def get_wall(id: int, date: str) -> "Wall":
     return Wall(id, date)
 
 
-def create_plot(select, statistic):
-    if select == "year":
-        data = (
-            (item.period, item.posts, item.likes, item.comments, item.reposts)
-            for item in statistic
-        )
-    else:
-        data = (
-            (item.period[:2], item.posts, item.likes, item.comments, item.reposts)
-            for item in statistic
-        )
+def create_plot(data):
     periods, posts, likes, comments, reposts = zip(*data)
 
     plt.bar(periods, posts, width=0.8, color=["grey"])
@@ -214,7 +203,7 @@ def create_plot(select, statistic):
 @app.route("/download_file")
 def download_file():
     """Downloads csv file with statistic."""
-    return send_file("../model/files/to_download.csv", status_code=503)
+    return send_file("../model/files/to_download.csv")
 
 
 @app.errorhandler(404)
